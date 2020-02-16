@@ -14,12 +14,10 @@ import (
 func main() {
 	l := log.New(os.Stdout, "product-api ", log.LstdFlags)
 
-	hh := handlers.NewHello(l)
-	gh := handlers.NewGoodbye(l)
+	ph := handlers.NewProducts(l)
 
 	sm := http.NewServeMux()
-	sm.Handle("/", hh)
-	sm.Handle("/goodbye", gh)
+	sm.Handle("/", ph)
 
 	// global timeouts
 	s := &http.Server{
@@ -30,17 +28,18 @@ func main() {
 		WriteTimeout: 1 * time.Second,
 	}
 
-	// no blocking goroutine (thread)
+	// no blocking goroutine (thread) to start the server
 	go func() {
 		err := s.ListenAndServe() // blocking function
 		if err != nil {
-			l.Fatal(err)
+			l.Println("Error starting server: %s\n", err)
+			os.Exit(1)
 		}
 	}()
 
 	// it will immediatly terminate as there is nothing to stop the execution
 	// so we need to block the execution and listen for the os signal events
-	sigChan := make(chan os.Signal)
+	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt)
 	signal.Notify(sigChan, os.Kill)
 
