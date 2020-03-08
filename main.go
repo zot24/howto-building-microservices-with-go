@@ -45,7 +45,7 @@ func main() {
 	go func() {
 		err := s.ListenAndServe() // blocking function
 		if err != nil {
-			l.Println("Error starting server: %s\n", err)
+			l.Println("Error starting server: \n", err)
 			os.Exit(1)
 		}
 	}()
